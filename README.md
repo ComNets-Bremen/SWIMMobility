@@ -1,6 +1,6 @@
 # SWIMMobility
 
-SWIMMobility is an implementation of the Small Worlds in Motion (SWIM) [1](https://arxiv.org/pdf/0809.2730.pdf) mobility model in the OMNeT++ Simulator [2](https://omnetpp.org). This implementation work has been done as part of the student projects at 'Sustainable Communication Networks Group, University of Bremen, Germany'.
+SWIMMobility is an implementation of the Small Worlds in Motion (SWIM) [[1](https://arxiv.org/pdf/0809.2730.pdf)] mobility model in the OMNeT++ Simulator [[2](https://omnetpp.org)]. This implementation work has been done as part of the student projects at `Sustainable Communication Networks Group, University of Bremen, Germany`.
 
 Introduction
 ============
@@ -8,7 +8,7 @@ Introduction
 SWIM is a mobility model that mathematically characterises the movement patterns of humans. It uses 2 intuitions of human mobility, viz., people usually visit mostly locations close to their home location and if they visit a location far away from home, it is due to its popularity. 
 
 
-The mathematical formulations of these intuitions is based on an equation that considers the distance to a location and the popularity of that location. This code is an implementation of the SWIM mobility model in OMNeT++ Simulator for the INET framework [3](https://inet.omnetpp.org).
+The mathematical formulations of these intuitions is based on an equation that considers the distance to a location and the popularity of that location. This code is an implementation of the SWIM mobility model in OMNeT++ Simulator for the INET framework [[3](https://inet.omnetpp.org)].
 
 
 Mobility Models in OMNeT++
@@ -26,9 +26,9 @@ Compiling the SWIM Mobility Model
 
 Place the following 3 files in the mobility model folder of the INET framework and rebuild.
 
-- 'SWIMMobility.ned'
-- 'SWIMMobility.h'
-- 'SWIMMobility.cc'
+- `SWIMMobility.ned`
+- `SWIMMobility.h`
+- `SWIMMobility.cc`
 
 
 Using the SWIM Mobility Model
@@ -38,7 +38,7 @@ Check the examples provided by the INET Framework in the 'examples/mobility' fol
 
 The SWIM model has a number of configurable parameters that are defined in the 'SWIMMobility.ned'. Each of these parameters has default values and if they are required to be changed, use the omnetpp.ini file to set these changed values. 
 
-- 'alpha' is the alpha value used in the SWIM model (default is 0.5)
+- `alpha` is the alpha value used in the SWIM model (default is 0.5)
 - TODO
 
 
