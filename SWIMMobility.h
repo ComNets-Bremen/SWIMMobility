@@ -59,7 +59,7 @@ struct nodeProp{
 
 namespace inet {
 
-class INET_API SWIMMobility : public LineSegmentsMobilityBase , public cListener
+class INET_API SWIMMobility : public LineSegmentsMobilityBase
 {
 protected:
     bool created;
@@ -75,15 +75,11 @@ protected:
     double alpha = 0;
     double radius;
 
-    char *updateNodeCountSignal;
-
     std::vector<loc> locations;
     std::vector<nodeProp> neighborLocs;
     std::vector<nodeProp> visitingLocs;
 
     Coord neew;
-
-    simsignal_t updateSig;
 
 private:
     Coord Home;
@@ -124,9 +120,8 @@ protected:
     /** Updates the number of nodes for given coordinates **/
     virtual int updateNodesCount(Coord update, bool inc);
 
-    /** Overrides the receive signal to implement extended functionality **/
-    virtual void receiveSignal(cComponent *source, simsignal_t signalID, const char *s, cObject *details) override;
-
+    /** Used to update a common locations table in all of the nodes **/
+    virtual void updateAllNodes(bool increase);
 
 public:
     /** Constructor **/
@@ -140,3 +135,4 @@ public:
 }//namespace inet
 
 #endif
+
