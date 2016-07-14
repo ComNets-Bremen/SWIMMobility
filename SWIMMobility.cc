@@ -54,9 +54,6 @@ void SWIMMobility::initialize(int stage){
     LineSegmentsMobilityBase::initialize(stage);
 
     if(stage == 0){
-        updateSig = registerSignal("updateSignal");
-        subscribe("updateSignal", this);
-        updateNodeCountSignal = (char*) malloc(sizeof(char)*25);
 
         speed = par("speed");
         alpha = par("alpha");
@@ -117,8 +114,7 @@ void SWIMMobility::setTargetPosition(){
             seperateAndUpdateWeights();
 
             if(!firstStep){
-                sprintf(updateNodeCountSignal,"%g %g %g %d", neew.x, neew.y, neew.z, 0);
-                emit(updateSig, updateNodeCountSignal);
+                updateAllNodes(false);
             }
 
             targetPosition = decision();
@@ -126,12 +122,14 @@ void SWIMMobility::setTargetPosition(){
             double distance = positionDelta.length();
             nextChange = simTime() + distance/speed;
 
-            sprintf(updateNodeCountSignal,"%g %g %g %d", neew.x, neew.y, neew.z, 1);
-            emit(updateSig, updateNodeCountSignal);
+            updateAllNodes(true);
         }
     }
     firstStep=false;
     nextMoveIsWait = !nextMoveIsWait;
+    for (int i=0;i<locations.size();i++){
+        EV<<locations[i].myCoordX<<" "<<locations[i].myCoordY<<" "<<locations[i].myCoordZ<<" "<<locations[i].noOfNodesPresent<<endl;
+    }
 }
 
 void SWIMMobility::move(){
@@ -151,11 +149,11 @@ bool SWIMMobility::createLocations(){
         opn = 1;
 
     for(int i=0;i<noOfLocs;i++){
-        if(maxAreaX>0)locations[i].myCoordX=rand()%((int)round(maxAreaX));
+        if(maxAreaX>0)locations[i].myCoordX=rand()%((int)round(maxAreaX)-10);
         else locations[i].myCoordX= 0;
-        if(maxAreaY>0)locations[i].myCoordY=rand()%((int)round(maxAreaY));
+        if(maxAreaY>0)locations[i].myCoordY=rand()%((int)round(maxAreaY)-10);
         else locations[i].myCoordY = 0;
-        if(maxAreaZ>0)locations[i].myCoordZ=rand()%((int)round(maxAreaZ));
+        if(maxAreaZ>0)locations[i].myCoordZ=rand()%((int)round(maxAreaZ)-10);
         else locations[i].myCoordZ = 0;
         locations[i].noOfNodesPresent=0;
         outfile<<locations[i].myCoordX<<" "<<locations[i].myCoordY<<" "<<locations[i].myCoordZ<<" "<<locations[i].noOfNodesPresent<<endl;
@@ -328,11 +326,13 @@ Coord SWIMMobility::chooseDestination(std::vector<nodeProp> array){
     target.y = sqrt(pow(radius,2) - pow(temp.x-target.x,2));
     if(target.y>0){
         target.y = temp.y - target.y + (rand()%int(target.y*2));
+        if(target.y <= 0) target.y = temp.y;
     }
     else{
         target.y=temp.y;
     }
     target.z = temp.z;
+    //target = temp;
 
     neew = temp;
 
@@ -370,37 +370,19 @@ int SWIMMobility::updateNodesCount(Coord update,bool inc){
     else return 0;
 }
 
-void SWIMMobility :: receiveSignal(cComponent *source, simsignal_t signalID, const char *s, cObject *details)
-{
-    int i=0;
-    double cord[4];
-    char string[25];
-    char * temp;
-    Coord updateThisLocation;
-
-    strncpy(string,s,25);
-    temp = strtok(string, " ");
-    cord[i]=atof(temp);
-
-    for(int i=1;i<=3;i++){
-        temp = strtok(NULL," ");
-        cord[i]=atof(temp);
-    }
-
-    updateThisLocation.x=cord[0];
-    updateThisLocation.y=cord[1];
-    updateThisLocation.z=cord[2];
-
-    if(cord[3]==0){
-        update = updateNodesCount(neew,false);
-    }
-    else{
-        update = updateNodesCount(neew,true);
+void SWIMMobility::updateAllNodes(bool increase){
+    cSimulation *currentSimulation = getSimulation();
+    int maxID = currentSimulation->getLastComponentId();
+    for (int currentID = 0; currentID <= maxID; currentID++) {
+        cModule *currentModule = currentSimulation->getModule(currentID);
+        SWIMMobility *mobile = dynamic_cast<SWIMMobility*>(currentModule);
+        if (currentModule != NULL && mobile != NULL) {
+            mobile->updateNodesCount(neew,increase);
+        }
     }
 }
 
 SWIMMobility::~SWIMMobility(){
-    free(updateNodeCountSignal);
 }
 
 } // namespace inet

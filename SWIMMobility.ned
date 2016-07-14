@@ -31,9 +31,7 @@ package inet.mobility.single;
 import inet.mobility.base.MovingMobilityBase;
 
 simple SWIMMobility extends MovingMobilityBase{
-    parameters:
-        @signal[updateSignal](type=string);
-        
+    parameters:        
         bool initFromDisplayString = default(true);
         
         int noOfLocations = default(20);
