@@ -25,6 +25,10 @@
 *
 * @author : Anas bin Muslim (anas1@uni-bremen.de)
 *
+* Change History:
+* Asanga Udugama (adu@comnets.uni-bremen.de)
+* All random numbers are obtained from OMNeT++ RNG functions instead of
+* the system RNG.
 */
 
 #include <algorithm>
@@ -49,7 +53,7 @@ SWIMMobility::SWIMMobility()
 
 void SWIMMobility::initialize(int stage){
 
-    srand(time(NULL));
+    // srand(time(NULL));
 
     LineSegmentsMobilityBase::initialize(stage);
 
@@ -63,6 +67,8 @@ void SWIMMobility::initialize(int stage){
         neighbourLocationLimit = par("neighbourLocationLimit");
         returnHomePercentage = par("returnHomePercentage");
 
+        usedRNG = par("usedRNG");
+
         if(radius == 0) radius = 1;
 
         locations.resize(noOfLocs);
@@ -75,7 +81,7 @@ void SWIMMobility::initialize(int stage){
         }
     }
     if(stage==13){
-        srand(time(NULL));
+        // srand(time(NULL));
 
         nodes = par("Hosts");
         maxAreaX = par("maxAreaX");
@@ -90,7 +96,7 @@ void SWIMMobility::initialize(int stage){
 
 void SWIMMobility::setTargetPosition(){
 
-    srand(time(NULL));
+    // srand(time(NULL));
 
     if(nextMoveIsWait){
         simtime_t waitTime = par("waitTime");
@@ -98,7 +104,8 @@ void SWIMMobility::setTargetPosition(){
     }
 
     else{
-        if(((double)rand()/(double)RAND_MAX) < (returnHomePercentage/100.00)){
+        if(uniform(0, 1, usedRNG) < ((double) returnHomePercentage / 100.00)){		
+        // if(((double)rand()/(double)RAND_MAX) < (returnHomePercentage/100.00)){
             targetPosition = Home;
             Coord positionDelta = targetPosition - lastPosition;
             double distance = positionDelta.length();
@@ -138,7 +145,7 @@ void SWIMMobility::move(){
 }
 
 bool SWIMMobility::createLocations(){
-    srand(time(NULL));
+    // srand(time(NULL));
 
     bool opn = false;
 
@@ -148,13 +155,25 @@ bool SWIMMobility::createLocations(){
     if(outfile.is_open())
         opn = 1;
 
-    for(int i=0;i<noOfLocs;i++){
-        if(maxAreaX>0)locations[i].myCoordX=rand()%((int)round(maxAreaX)-10);
-        else locations[i].myCoordX= 0;
-        if(maxAreaY>0)locations[i].myCoordY=rand()%((int)round(maxAreaY)-10);
-        else locations[i].myCoordY = 0;
-        if(maxAreaZ>0)locations[i].myCoordZ=rand()%((int)round(maxAreaZ)-10);
-        else locations[i].myCoordZ = 0;
+    for(int i = 0; i < noOfLocs; i++) {
+        if(maxAreaX > 0) {
+			//locations[i].myCoordX = rand()%((int)round(maxAreaX)-10);
+			locations[i].myCoordX = (double) intuniform(0, ((int)round(maxAreaX) - 10 - 1), usedRNG);
+        } else {
+			locations[i].myCoordX = 0;
+		}
+        if(maxAreaY > 0) {
+			//locations[i].myCoordY = rand()%((int)round(maxAreaY)-10);
+			locations[i].myCoordY = (double) intuniform(0, ((int)round(maxAreaY) - 10 - 1), usedRNG);
+        } else {
+			locations[i].myCoordY = 0;
+		}
+        if(maxAreaZ > 0) {
+			//locations[i].myCoordZ = rand()%((int)round(maxAreaZ)-10);
+			locations[i].myCoordZ = (double) intuniform(0, ((int)round(maxAreaZ) - 10 - 1), usedRNG);
+        } else {
+			locations[i].myCoordZ = 0;
+		}
         locations[i].noOfNodesPresent=0;
         outfile<<locations[i].myCoordX<<" "<<locations[i].myCoordY<<" "<<locations[i].myCoordZ<<" "<<locations[i].noOfNodesPresent<<endl;
     }
@@ -225,7 +244,7 @@ void SWIMMobility::seperateAndUpdateWeights(){
 }
 
 Coord SWIMMobility::decision(){
-    srand(time(NULL));
+    // srand(time(NULL));
 
     Coord dest;
     nodeProp temp;
@@ -233,7 +252,8 @@ Coord SWIMMobility::decision(){
     sort(neighborLocs.begin(), neighborLocs.end(), sortByWeight);
     sort(visitingLocs.begin(), visitingLocs.end(), sortByWeight);
 
-    if ((rand()%10)<=(alpha*10)){
+    // if ((rand()%10)<=(alpha*10)){
+	if (uniform(0.0, 1.0, usedRNG) <= alpha){
 
         //Choose Neighbor location as next destination
         dest = chooseDestination(neighborLocs);
@@ -260,20 +280,21 @@ Coord SWIMMobility::decision(){
 }
 
 Coord SWIMMobility::chooseDestination(std::vector<nodeProp> array){
-    srand(time(NULL));
+    // srand(time(NULL));
 
     int size = array.size();
-    int random;
+    int random = 0;
     int popular = 0;
     int notPopular = 0;
 
     Coord temp;
     Coord target;
 
-    random = rand();
+    // random = rand();
 
-    if(size>0){
-        random=random%size;
+    if(size > 0){
+        // random=random%size;
+        random = intuniform(0, (size - 1), usedRNG);
     }
     else{
         //There are no locations to be chosen from
@@ -290,16 +311,21 @@ Coord SWIMMobility::chooseDestination(std::vector<nodeProp> array){
     notPopular = array.size() - popular;
 
     if(popular > 0){
-        if(rand()%10 > (10 - popularityDecisionThreshold)){
+        if(intuniform(0, 10, usedRNG) > (10 - popularityDecisionThreshold)){
+        // if(rand()%10 > (10 - popularityDecisionThreshold)){
             //Choosing popular location
-            random = rand()%popular;
+            // random = rand()%popular;
+            random = intuniform(0, (popular - 1), usedRNG);
+			
             temp.x = array[random].locCoordX;
             temp.y = array[random].locCoordY;
             temp.z = array[random].locCoordZ;
         }
         else{
             //Choosing not much popular location
-            random = rand()%notPopular;
+            // random = rand()%notPopular;
+            random = intuniform(0, (notPopular - 1), usedRNG);
+			
             temp.x = array[random+popular].locCoordX;
             temp.y = array[random+popular].locCoordY;
             temp.z = array[random+popular].locCoordZ;
@@ -308,7 +334,9 @@ Coord SWIMMobility::chooseDestination(std::vector<nodeProp> array){
     else{
         if(notPopular > 0){
             //Choosing not much popular location
-            random = rand()%notPopular;
+            // random = rand()%notPopular;
+            random = intuniform(0, (notPopular - 1), usedRNG);
+			
             temp.x = array[random+popular].locCoordX;
             temp.y = array[random+popular].locCoordY;
             temp.z = array[random+popular].locCoordZ;
@@ -322,14 +350,17 @@ Coord SWIMMobility::chooseDestination(std::vector<nodeProp> array){
         }
     }
 
-    target.x = temp.x - radius + (rand()%int(radius*2));
+    // target.x = temp.x - radius + (rand()%int(radius*2));
+    target.x = temp.x - radius + intuniform(0, (int(radius * 2) - 1), usedRNG);
     target.y = sqrt(pow(radius,2) - pow(temp.x-target.x,2));
-    if(target.y>0){
-        target.y = temp.y - target.y + (rand()%int(target.y*2));
-        if(target.y <= 0) target.y = temp.y;
-    }
-    else{
-        target.y=temp.y;
+    if(target.y > 0) {
+        // target.y = temp.y - target.y + (rand()%int(target.y*2));
+        target.y = temp.y - target.y + intuniform(0, (int(target.y * 2) - 1), usedRNG);
+        if(target.y <= 0) {
+			target.y = temp.y;
+		}
+    } else {
+		target.y=temp.y;
     }
     target.z = temp.z;
     //target = temp;

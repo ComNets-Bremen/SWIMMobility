@@ -51,6 +51,8 @@ simple SWIMMobility extends MovingMobilityBase{
         double alpha = default(0.5);
         
         volatile double waitTime @unit(s) = default(0s);
+		
+		int usedRNG = default(0);
         
         @class (SWIMMobility);
 }

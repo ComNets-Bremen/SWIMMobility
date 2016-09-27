@@ -72,7 +72,7 @@ protected:
     int returnHomePercentage;
 
     double speed;
-    double alpha = 0;
+    double alpha = 0.0;
     double radius;
 
     std::vector<loc> locations;
@@ -83,6 +83,7 @@ protected:
 
 private:
     Coord Home;
+	int usedRNG;
 
 public:
     int noOfLocs;
