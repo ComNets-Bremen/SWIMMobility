@@ -1,5 +1,5 @@
 /******************************************************************************
- * SWIMMobility - A SWIM implementation for the INET Framework of the OMNeT++ 
+ * SWIMMobility - A SWIM implementation for the INET Framework of the OMNeT++
  * Simulator.
  *
  * Copyright (C) 2016, Sustainable Communication Networks, University of Bremen, Germany
@@ -20,7 +20,7 @@
  ******************************************************************************/
 
 /**
-* The C++ include file of the SWIM mobility model for the INET Framework 
+* The C++ include file of the SWIM mobility model for the INET Framework
 * in OMNeT++.
 *
 * @author : Anas bin Muslim (anas1@uni-bremen.de)
@@ -40,7 +40,7 @@
 #include "inet/common/INETDefs.h"
 #include "inet/mobility/base/LineSegmentsMobilityBase.h"
 
-struct loc{
+struct loc {
     int noOfNodesPresent;
 
     double myCoordX;
@@ -48,7 +48,7 @@ struct loc{
     double myCoordZ;
 };
 
-struct nodeProp{
+struct nodeProp {
     int seen = 0;
 
     double locCoordX;
@@ -56,6 +56,8 @@ struct nodeProp{
     double locCoordZ;
     double weight = 0;
 };
+
+#define PI 3.14159265
 
 namespace inet {
 
@@ -68,7 +70,7 @@ protected:
 
     int update;
     int popularityDecisionThreshold;
-    int neighbourLocationLimit;
+    double neighbourLocationLimit;
     int returnHomePercentage;
 
     double speed;
@@ -80,10 +82,11 @@ protected:
     std::vector<nodeProp> visitingLocs;
 
     Coord neew;
+    int usedRNG;
+    Coord homeCoord;
 
 private:
-    Coord Home;
-	int usedRNG;
+    bool homeCoordFound;
 
 public:
     int noOfLocs;
@@ -93,6 +96,7 @@ public:
     double maxAreaY;
     double maxAreaZ;
 
+    int count = 0;
 
 protected:
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
@@ -116,7 +120,7 @@ protected:
     virtual Coord decision();
 
     /** Chooses a random set of Coordinates from given array **/
-    virtual Coord chooseDestination(std::vector<nodeProp> array);
+    virtual Coord chooseDestination(std::vector<nodeProp> &array);
 
     /** Updates the number of nodes for given coordinates **/
     virtual int updateNodesCount(Coord update, bool inc);

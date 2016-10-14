@@ -36,12 +36,16 @@ Using the SWIM Mobility Model
 
 Check the examples provided by the INET Framework in the 'examples/mobility' folder to see how a mobility model is configured and used in a simulation.
 
-The SWIM model has a number of configurable parameters that are defined in the 'SWIMMobility.ned'. Each of these parameters has default values and if they are required to be changed, use the omnetpp.ini file to set these changed values. 
+The SWIM model has a number of configurable parameters that are defined in the 'SWIMMobility.ned'. Each of these parameters has a default value and if they are required to be changed, use the `omnetpp.ini` file to set these changed values. The following list provides the parameters specific to the SWIM model. 
 
-- `alpha` is the alpha value used in the SWIM model (default is 0.5)
-- TODO
-
-
+- `alpha` - The alpha value used in the SWIM model (default is 0.5);
+- `noOfLocations` - The number of locations spread over the mobility area (default is 20);
+- `Hosts` - The number of hosts in the scenario (defaults to the hosts defined in the network); 
+- `popularityDecisionThreshold` - The threshold used to decide between selecting a popular location or a not so popular location based on weights. The value range from 0 to 10 (default is 7). A higher value results in placing a more emphasis on a popular location; 
+- `returnHomePercentage` - Every node may move from location to location. If this variable is set, then the node returns home for the given percentage of times (defaults to 15 percent);
+- `neighbourLocationLimit` - The radius within which all locations found are considered as being neighbouring locations. Outside this range are visiting locations (defaults to 300 meters) 
+- `radius` - This variable defines the radius within which a node should be located at selected neighbouring/visiting location. This is done to prevent nodes piling up at the same location (defaults to 5 meters).
+- `usedRNG` - The number of the RNG to use for all SWIM related random numbers (defined in omnetpp.ini).
 
 Support
 =======

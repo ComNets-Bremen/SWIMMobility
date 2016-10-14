@@ -1,5 +1,5 @@
 //
-// SWIMMobility - A SWIM implementation for the INET Framework of the OMNeT++ 
+// SWIMMobility - A SWIM implementation for the INET Framework of the OMNeT++
 // Simulator.
 //
 // Copyright (C) 2016, Sustainable Communication Networks, University of Bremen, Germany
@@ -20,26 +20,31 @@
 //
 //
 //
-// The main model definition file (NED) of the SWIM mobility model for the 
+// The main model definition file (NED) of the SWIM mobility model for the
 // INET Framework in OMNeT++.
 //
 // author : Anas bin Muslim (anas1@uni-bremen.de)
 //
+// Change History:
+// Asanga Udugama (adu@comnets.uni-bremen.de)
+// - RNG numer added to use to generate random numbers
 //
 
 package inet.mobility.single;
 import inet.mobility.base.MovingMobilityBase;
 
 simple SWIMMobility extends MovingMobilityBase{
-    parameters:        
+    parameters:
         bool initFromDisplayString = default(true);
-        
+
         int noOfLocations = default(20);
         int Hosts = default(Hosts);
         int popularityDecisionThreshold = default(7); //0-10
         int returnHomePercentage = default(15); //0-100
-        int neighbourLocationLimit @unit(m) = default(300m);
-        
+        double neighbourLocationLimit @unit(m) = default(300m);
+        double radius @unit(m)= default(5m);
+        double alpha = default(0.5);
+
         double speed @unit(mps) = default(20mps);
         double initialX @unit(m) = default(uniform(constraintAreaMinX, constraintAreaMaxX));
         double initialY @unit(m) = default(uniform(constraintAreaMinY, constraintAreaMaxY));
@@ -47,12 +52,11 @@ simple SWIMMobility extends MovingMobilityBase{
         double maxAreaX @unit(m) = default(constraintAreaMaxX);
         double maxAreaY @unit(m) = default(constraintAreaMaxY);
         double maxAreaZ @unit(m) = default(0m);//(constraintAreaMaxZ);
-        double radius @unit(m)= default(5m);
-        double alpha = default(0.5);
-        
+
         volatile double waitTime @unit(s) = default(0s);
-		
-		int usedRNG = default(0);
-        
+
+        int usedRNG = default(0);
+
         @class (SWIMMobility);
 }
+
