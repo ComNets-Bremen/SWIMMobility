@@ -57,6 +57,11 @@ SWIMMobility::SWIMMobility()
     homeCoordFound = false;
 }
 
+void SWIMMobility::finish()
+{
+	locationsCreated = 0;
+}
+
 void SWIMMobility::initialize(int stage)
 {
 
@@ -66,6 +71,15 @@ void SWIMMobility::initialize(int stage)
 
     if(stage == 0){
 
+		nextMoveIsWait = false;
+    	created = false;
+    	firstStep = true;
+    	maxAreaX = 400.0;
+    	maxAreaY = 400.0;
+    	maxAreaZ = 0.0;
+    	count = 0;
+    	homeCoordFound = false;
+    
         // read all the parameters
         speed = par("speed");
         alpha = par("alpha");
