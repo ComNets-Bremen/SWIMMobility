@@ -37,7 +37,7 @@
  * Matthias Lehmann (matthias.lehmann@tuhh.de)
  * - regeneration of locations when location count changes
  */
-ö
+
 #include <algorithm>
 
 #include "inet/mobility/single/SWIMMobility.h"
