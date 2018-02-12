@@ -20,20 +20,24 @@
  ******************************************************************************/
 
 /**
-* The C++ implementation file of the SWIM mobility model for the INET Framework
-* in OMNeT++.
-*
-* @author : Anas bin Muslim (anas1@uni-bremen.de)
-*
-* Change History:
-* Asanga Udugama (adu@comnets.uni-bremen.de)
-* - All random numbers are obtained from OMNeT++ RNG functions instead of
-*   the system RNG.
-* - Code commented
-* - Home coordinates found in setTargetPosition()
-* - Bug fixes
-*/
-
+ * The C++ implementation file of the SWIM mobility model for the INET Framework
+ * in OMNeT++.
+ *
+ * @author : Anas bin Muslim (anas1@uni-bremen.de)
+ *
+ * Change History:
+ * Asanga Udugama (adu@comnets.uni-bremen.de)
+ * - All random numbers are obtained from OMNeT++ RNG functions instead of
+ *   the system RNG.
+ * - Code commented
+ * - Home coordinates found in setTargetPosition()
+ * - Bug fixes
+ * Anna Förster (anna.foerster@comnets.uni-bremen.de)
+ * - handling for automated simulation runs for multiple seeds
+ * Matthias Lehmann (matthias.lehmann@tuhh.de)
+ * - regeneration of locations when location count changes
+ */
+ö
 #include <algorithm>
 
 #include "inet/mobility/single/SWIMMobility.h"
@@ -50,16 +54,13 @@ SWIMMobility::SWIMMobility()
     nextMoveIsWait = false;
     created = false;
     firstStep = true;
-    maxAreaX = 400.0;
-    maxAreaY = 400.0;
-    maxAreaZ = 0.0;
     count = 0;
     homeCoordFound = false;
 }
 
 void SWIMMobility::finish()
 {
-	locationsCreated = 0;
+    locationsCreated = 0;
 }
 
 void SWIMMobility::initialize(int stage)
@@ -71,15 +72,6 @@ void SWIMMobility::initialize(int stage)
 
     if(stage == 0){
 
-		nextMoveIsWait = false;
-    	created = false;
-    	firstStep = true;
-    	maxAreaX = 400.0;
-    	maxAreaY = 400.0;
-    	maxAreaZ = 0.0;
-    	count = 0;
-    	homeCoordFound = false;
-    
         // read all the parameters
         speed = par("speed");
         alpha = par("alpha");
@@ -90,10 +82,16 @@ void SWIMMobility::initialize(int stage)
         returnHomePercentage = par("returnHomePercentage");
         usedRNG = par("usedRNG");
         nodes = par("Hosts");
-        maxAreaX = par("maxAreaX");
-        maxAreaY = par("maxAreaY");
-        maxAreaZ = par("maxAreaZ");
+        dimensions = par("dimensions");
 
+        maxAreaX = constraintAreaMax.x;
+        maxAreaY = constraintAreaMax.y;
+        maxAreaZ = constraintAreaMax.z;
+        nextMoveIsWait = false;
+        created = false;
+        firstStep = true;
+        count = 0;
+        homeCoordFound = false;
 
         // radius should never be zero
         if(radius == 0) {
@@ -102,6 +100,23 @@ void SWIMMobility::initialize(int stage)
 
         // extend array to hold all the locations
         locations.resize((noOfLocs));
+
+        // check if file already exists
+        std::string line;
+        int i = 0;
+        std::ifstream infile("locations.txt");
+        if(infile) {
+            // read number of lines in file
+            while (getline(infile, line)) {
+                i++;
+            }
+            // if number of line in file equals or is greater than noOfLocs
+            // use current file otherwise create new
+            if(noOfLocs <= i) {
+                locationsCreated = 1;
+            }
+        }
+
 
         // one of the nodes creates the locations.txt file which
         // will be used by all nodes.
@@ -135,7 +150,7 @@ void SWIMMobility::setTargetPosition()
         //     << " :: target pos :: x pos :: 0 :: y pos :: 0 :: next change " << nextChange << "\n";
         // end temp code
 
-    // if the next action is to start moving, compute the next location to move
+        // if the next action is to start moving, compute the next location to move
     } else {
         double randomNum = uniform(0.0, 1.0, usedRNG);
         double returnHomeDecimalFraction = returnHomePercentage / 100.0;
@@ -144,6 +159,10 @@ void SWIMMobility::setTargetPosition()
         // other location (neighboring or visiting), provided that
         // node is not already at home location
         if(randomNum < returnHomeDecimalFraction && lastPosition != homeCoord) {
+
+            if(!firstStep) {
+                updateAllNodes(false);
+            }
 
             // select home location to move to
             targetPosition = homeCoord;
@@ -208,7 +227,7 @@ void SWIMMobility::setTargetPosition()
 
 void SWIMMobility::move()
 {
-    // this method is called everytime the node moves
+    // this method is called every time the node moves
     LineSegmentsMobilityBase::move();
     raiseErrorIfOutside();
 }
@@ -250,7 +269,12 @@ bool SWIMMobility::createLocations(){
         locations[i].myCoordY = (int) coordElem;
 
         // z coord is always 0
-        locations[i].myCoordZ = 0.0;
+        if(dimensions == 3){
+            coordElem = uniform((radius * 2.0), (maxAreaZ - (radius * 2.0)), usedRNG);
+            locations[i].myCoordZ = (int) coordElem;
+        } else {
+            locations[i].myCoordZ = 0.0;
+        }
 
         locations[i].noOfNodesPresent = 0;
 
@@ -286,7 +310,7 @@ bool SWIMMobility::readLocations()
     // close file
     infile.close();
 
-    return 1;
+    return true;
 }
 
 void SWIMMobility::seperateAndUpdateWeights()
@@ -372,8 +396,8 @@ Coord SWIMMobility::decision()
         if(!(dest.x <= 0 && dest.y <= 0 && dest.z <= 0)) {
             return dest;
 
-        // if there was a invalid destination, choose visiting location
-        // as next destination (NL 0 0 0)
+            // if there was a invalid destination, choose visiting location
+            // as next destination (NL 0 0 0)
         } else {
             return chooseDestination(visitingLocs);
         }
@@ -386,8 +410,8 @@ Coord SWIMMobility::decision()
         if (!(dest.x <= 0.0 && dest.y <= 0.0 && dest.z <= 0.0)) {
             return dest;
 
-        // if there was a invalid destination, choose neighbor location
-        // as next destination (VL 0 0 0)
+            // if there was a invalid destination, choose neighbor location
+            // as next destination (VL 0 0 0)
         } else {
             return chooseDestination(neighborLocs);
         }

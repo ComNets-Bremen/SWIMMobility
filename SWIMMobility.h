@@ -70,9 +70,10 @@ protected:
 
     int update;
     int popularityDecisionThreshold;
-    double neighbourLocationLimit;
     int returnHomePercentage;
+    int dimensions;
 
+    double neighbourLocationLimit;
     double speed;
     double alpha = 0.0;
     double radius;
@@ -102,7 +103,7 @@ protected:
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
 
     virtual void initialize(int stage) override;
-    
+
     virtual void finish() override;
 
     virtual void setTargetPosition() override;

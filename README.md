@@ -21,14 +21,21 @@ To simplify the implementation of mobility, a set of base implementations are pr
 This SWIM implementation extends the LineSegmentsMobilityBase class.
 
 
-Compiling the SWIM Mobility Model
-=================================
+Building the SWIM Mobility Model
+================================
 
-Place the following 3 files in the mobility model folder of the INET framework and rebuild.
+Place the following 3 files in the 'src/inet/mobility/single' folder of the INET framework code and rebuild.
 
 - `SWIMMobility.ned`
 - `SWIMMobility.h`
 - `SWIMMobility.cc`
+
+To rebuild INET framework (without rebuilding the whole INET framework), follow the steps below while in the root folder of the INET framework.
+
+- `make makefiles`
+- `make MODE=release`
+
+The `MODE=release` is to create a non-debuggable version of the INET framework. For a debuggable version, use `MODE=debug`.
 
 
 Using the SWIM Mobility Model
@@ -46,6 +53,9 @@ The SWIM model has a number of configurable parameters that are defined in the '
 - `neighbourLocationLimit` - The radius within which all locations found are considered as being neighbouring locations. Outside this range are visiting locations (defaults to 300 meters) 
 - `radius` - This variable defines the radius within which a node should be located at selected neighbouring/visiting location. This is done to prevent nodes piling up at the same location (defaults to 5 meters).
 - `usedRNG` - The number of the RNG to use for all SWIM related random numbers (defined in omnetpp.ini).
+- `waitTime` - The duration of the pause time, after a destination is reached (in seconds).
+- `speed` - The velocity of the movement of a node (in meters per second).
+
 
 Support
 =======
@@ -54,5 +64,5 @@ If you have any questions or comments regarding this code, please write to,
 
 - Anas bin Muslim (anas1@uni-bremen.de),
 - Asanga Udugama (adu@comnets.uni-bremen.de) or 
-- Anna Foerster (anna.foerster@comnets.uni-bremen.de)
+- Anna Förster (anna.foerster@comnets.uni-bremen.de)
 
