@@ -32,6 +32,8 @@
 // - handling for automated simulation runs for multiple seeds
 // Matthias Lehmann (matthias.lehmann@tuhh.de)
 // - regeneration of locations when location count changes
+// Asanga Udugama (adu@comnets.uni-bremen.de)
+// - Introduced a parameter to decide the creation of the locations file
 //
 
 package inet.mobility.single;
@@ -55,13 +57,12 @@ simple SWIMMobility extends MovingMobilityBase{
         double initialX @unit(m) = default(uniform(constraintAreaMinX, constraintAreaMaxX));
         double initialY @unit(m) = default(uniform(constraintAreaMinY, constraintAreaMaxY));
         double initialZ @unit(m) = default(0m);//default(uniform(constraintAreaMinZ, constraintAreaMaxZ));
-        //double maxAreaX @unit(m) = default(constraintAreaMaxX);
-        //double maxAreaY @unit(m) = default(constraintAreaMaxY);
-        //double maxAreaZ @unit(m) = default(0m);//(constraintAreaMaxZ);
 
         volatile double waitTime @unit(s) = default(0s);
 
         int usedRNG = default(0);
+        
+        bool recreateLocationsFile = default(true);
 
         @class (SWIMMobility);
 }

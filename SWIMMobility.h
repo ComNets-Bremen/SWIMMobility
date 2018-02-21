@@ -56,8 +56,10 @@ struct nodeProp {
     double locCoordZ;
     double weight = 0;
 };
-
+#ifndef PI
 #define PI 3.14159265
+#endif
+#define LOCATIONS_FILE          "locations.txt"
 
 namespace inet {
 
@@ -85,6 +87,7 @@ protected:
     Coord neew;
     int usedRNG;
     Coord homeCoord;
+    bool recreateLocationsFile;
 
 private:
     bool homeCoordFound;

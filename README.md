@@ -55,6 +55,7 @@ The SWIM model has a number of configurable parameters that are defined in the '
 - `usedRNG` - The number of the RNG to use for all SWIM related random numbers (defined in omnetpp.ini).
 - `waitTime` - The duration of the pause time, after a destination is reached (in seconds).
 - `speed` - The velocity of the movement of a node (in meters per second).
+- `recreateLocationsFile` - The locations file is recreated (or the existing file is used) during a simulation  (true or false, default is true). When created, it is not removed at the end of the simulation. __IMPORTANT:__ Locations file creation process draws a series of random numbers from the same source used to decide location selections when moving. Therefore, the random number series used for moving nodes may differ from simulation to simulation, if this file has to be created in one simulation and not, in another.
 
 
 Support

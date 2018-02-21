@@ -36,6 +36,8 @@
  * - handling for automated simulation runs for multiple seeds
  * Matthias Lehmann (matthias.lehmann@tuhh.de)
  * - regeneration of locations when location count changes
+ * Asanga Udugama (adu@comnets.uni-bremen.de)
+ * - Introduced a parameter to decide the creation of the locations file
  */
 
 #include <algorithm>
@@ -83,6 +85,7 @@ void SWIMMobility::initialize(int stage)
         usedRNG = par("usedRNG");
         nodes = par("Hosts");
         dimensions = par("dimensions");
+        recreateLocationsFile = par("recreateLocationsFile");
 
         maxAreaX = constraintAreaMax.x;
         maxAreaY = constraintAreaMax.y;
@@ -100,24 +103,35 @@ void SWIMMobility::initialize(int stage)
 
         // extend array to hold all the locations
         locations.resize((noOfLocs));
-
-        // check if file already exists
-        std::string line;
-        int i = 0;
-        std::ifstream infile("locations.txt");
-        if(infile) {
-            // read number of lines in file
-            while (getline(infile, line)) {
-                i++;
+        
+        // if recreateLocationsFile true and file exists, remove it
+        if (!locationsCreated && recreateLocationsFile) {
+            std::ifstream infile(LOCATIONS_FILE);
+            if(infile) {
+                infile.close();
+                remove(LOCATIONS_FILE);
             }
-            // if number of line in file equals or is greater than noOfLocs
-            // use current file otherwise create new
-            if(noOfLocs <= i) {
-                locationsCreated = 1;
+            
+        } else {
+
+            // check if file already exists and if so, the location count is right
+            std::string line;
+            int i = 0;
+            std::ifstream infile(LOCATIONS_FILE);
+            if(infile) {
+                // read number of lines in file
+                while (getline(infile, line)) {
+                    i++;
+                }
+                // if number of line in file equals or is greater than noOfLocs
+                // use current file otherwise create new
+                if(noOfLocs <= i) {
+                    locationsCreated = 1;
+                }
+                infile.close();
             }
         }
-
-
+    
         // one of the nodes creates the locations.txt file which
         // will be used by all nodes.
         if(!locationsCreated) {
@@ -237,7 +251,7 @@ bool SWIMMobility::createLocations(){
 
     // open the file in output mode
     std::ofstream outfile;
-    outfile.open("locations.txt",std::ios::out|std::ios::trunc);
+    outfile.open(LOCATIONS_FILE, std::ios::out|std::ios::trunc);
 
     if(outfile.is_open())
         opn = 1;
